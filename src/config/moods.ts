@@ -7,7 +7,7 @@ export const MOOD_CONFIGS: Record<string, MoodConfig> = {
     color: 'bg-blue-500',
     types: ['cafe', 'library'],
     keywords: ['coffee', 'wifi', 'coworking'],
-    radius: 2000,
+    radius: 3000,
   },
   date: {
     label: 'Date Night',
@@ -23,7 +23,7 @@ export const MOOD_CONFIGS: Record<string, MoodConfig> = {
     color: 'bg-orange-500',
     types: ['restaurant', 'cafe', 'meal_takeaway'],
     keywords: ['fast food', 'quick', 'takeout'],
-    radius: 1500,
+    radius: 2000,
   },
   budget: {
     label: 'Budget Friendly',

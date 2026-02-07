@@ -1,11 +1,10 @@
-import { useState, useCallback, useMemo } from 'react';
-import { MapPin, Loader2, AlertCircle } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { MapPin, Loader2 } from 'lucide-react';
 import MoodSelector from './components/MoodSelector';
 import PlaceCard from './components/PlaceCard';
 import FilterBar from './components/FilterBar';
 import Map from './components/Map';
-import { useGoogleMaps } from './hooks/useGoogleMaps';
-import { getUserLocation, searchNearbyPlaces } from './services/placesService';
+import { getUserLocation, searchNearbyPlaces } from './services/overpassService';
 import { Mood, Place, UserLocation, SortOption } from './types';
 
 function App() {
@@ -19,9 +18,6 @@ function App() {
   const [sortBy, setSortBy] = useState<SortOption>('distance');
   const [showOpenOnly, setShowOpenOnly] = useState(false);
   const [minRating, setMinRating] = useState(0);
-
-  const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-  const { isLoaded: mapsLoaded, error: mapsError } = useGoogleMaps(apiKey);
 
   const handleGetLocation = async () => {
     setLoading(true);
@@ -48,7 +44,9 @@ function App() {
       const results = await searchNearbyPlaces(userLocation, mood);
       setPlaces(results);
     } catch (err) {
-      setError('Failed to search for places. Please try again.');
+      console.error('Places search error:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      setError(`Failed to search for places: ${errorMessage}`);
       setPlaces([]);
     } finally {
       setLoading(false);
@@ -84,41 +82,11 @@ function App() {
     return filtered;
   }, [places, sortBy, showOpenOnly, minRating]);
 
-  const handleMapLoad = useCallback(() => {
+  const handleMapLoad = () => {
     setMapLoaded(true);
-  }, []);
+  };
 
-  if (mapsError || (!apiKey && mapsLoaded)) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md text-center">
-          <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            Configuration Required
-          </h2>
-          <p className="text-gray-600 mb-4">
-            Please add your Google Maps API key to the environment variables.
-          </p>
-          <div className="bg-gray-50 rounded-lg p-4 text-left">
-            <p className="text-sm font-mono text-gray-700">
-              VITE_GOOGLE_MAPS_API_KEY=your_api_key
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
-  if (!mapsLoaded) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
-          <p className="text-gray-600 font-medium">Loading Google Maps...</p>
-        </div>
-      </div>
-    );
-  }
 
   if (!userLocation) {
     return (
@@ -197,57 +165,57 @@ function App() {
         )}
 
         {!loading && places.length > 0 && (
-          <>
-            <div className="mb-6">
-              <FilterBar
-                sortBy={sortBy}
-                onSortChange={setSortBy}
-                showOpenOnly={showOpenOnly}
-                onOpenOnlyChange={setShowOpenOnly}
-                minRating={minRating}
-                onMinRatingChange={setMinRating}
-                resultsCount={filteredAndSortedPlaces.length}
-              />
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="space-y-4 max-h-[calc(100vh-400px)] overflow-y-auto pr-2">
-                {filteredAndSortedPlaces.length > 0 ? (
-                  filteredAndSortedPlaces.map((place) => (
-                    <PlaceCard
-                      key={place.id}
-                      place={place}
-                      onSelect={setSelectedPlace}
-                    />
-                  ))
-                ) : (
-                  <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center">
-                    <p className="text-gray-600">
-                      No places match your filters. Try adjusting them.
-                    </p>
-                  </div>
-                )}
-              </div>
-
-              <div className="h-[calc(100vh-400px)] sticky top-6">
-                <Map
-                  userLocation={userLocation}
-                  places={filteredAndSortedPlaces}
-                  selectedPlace={selectedPlace}
-                  onMapLoad={handleMapLoad}
-                />
-              </div>
-            </div>
-          </>
-        )}
-
-        {!loading && selectedMood && places.length === 0 && !error && (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center">
-            <p className="text-gray-600">
-              No places found for your selected mood. Try a different option.
-            </p>
+          <div className="mb-6">
+            <FilterBar
+              sortBy={sortBy}
+              onSortChange={setSortBy}
+              showOpenOnly={showOpenOnly}
+              onOpenOnlyChange={setShowOpenOnly}
+              minRating={minRating}
+              onMinRatingChange={setMinRating}
+              resultsCount={filteredAndSortedPlaces.length}
+            />
           </div>
         )}
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[600px]">
+          {!loading && places.length > 0 && (
+            <div className="space-y-4 h-full overflow-y-auto pr-2 custom-scrollbar">
+              {filteredAndSortedPlaces.length > 0 ? (
+                filteredAndSortedPlaces.map((place) => (
+                  <PlaceCard
+                    key={place.id}
+                    place={place}
+                    onSelect={setSelectedPlace}
+                  />
+                ))
+              ) : (
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center">
+                  <p className="text-gray-600">
+                    No places match your filters. Try adjusting them.
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {!loading && selectedMood && places.length === 0 && !error && (
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center h-full flex items-center justify-center">
+              <p className="text-gray-600">
+                No places found for your selected mood. Try a different option.
+              </p>
+            </div>
+          )}
+
+          <div className="h-full sticky top-6">
+            <Map
+              userLocation={userLocation}
+              places={filteredAndSortedPlaces}
+              selectedPlace={selectedPlace}
+              onMapLoad={handleMapLoad}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );
