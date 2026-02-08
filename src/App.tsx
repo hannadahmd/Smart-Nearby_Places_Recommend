@@ -178,9 +178,9 @@ function App() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[600px]">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:h-[calc(100vh-180px)] h-auto">
           {!loading && places.length > 0 && (
-            <div className="space-y-4 h-full overflow-y-auto pr-2 custom-scrollbar">
+            <div className="space-y-4 h-[50vh] lg:h-full overflow-y-auto pr-2 custom-scrollbar">
               {filteredAndSortedPlaces.length > 0 ? (
                 filteredAndSortedPlaces.map((place) => (
                   <PlaceCard
@@ -207,7 +207,7 @@ function App() {
             </div>
           )}
 
-          <div className="h-full sticky top-6">
+          <div className="h-[50vh] lg:h-full sticky top-6">
             <Map
               userLocation={userLocation}
               places={filteredAndSortedPlaces}
