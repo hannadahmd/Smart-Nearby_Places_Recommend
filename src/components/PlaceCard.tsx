@@ -29,25 +29,28 @@ export default function PlaceCard({ place, onSelect }: PlaceCardProps) {
         {place.name}
       </h3>
 
-      <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
-        <MapPin className="w-4 h-4" />
-        <span>
-          {place.distance
-            ? `${place.distance.toFixed(1)} km away`
-            : 'Distance unknown'}
-        </span>
-      </div>
+      <div className="flex items-center gap-4 text-sm text-gray-600 mb-2 flex-wrap">
+        <div className="flex items-center gap-2">
+          <MapPin className="w-4 h-4" />
+          <span>
+            {place.distance
+              ? `${place.distance.toFixed(1)} km away`
+              : 'Distance unknown'}
+          </span>
+        </div>
 
-      <div className="flex items-center gap-4 flex-wrap">
         {place.rating && (
-          <div className="flex items-center gap-1 text-sm">
+          <div className="flex items-center gap-1">
             <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-            <span className="font-medium">{place.rating.toFixed(1)}</span>
+            <span className="font-medium text-gray-900">{place.rating.toFixed(1)}</span>
             {place.userRatingsTotal && (
               <span className="text-gray-500">({place.userRatingsTotal})</span>
             )}
           </div>
         )}
+      </div>
+
+      <div className="flex items-center gap-4 flex-wrap">
 
         {place.priceLevel && (
           <div className="flex items-center gap-1 text-sm text-gray-600">

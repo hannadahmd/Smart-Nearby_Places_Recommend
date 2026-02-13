@@ -36,7 +36,7 @@ export default function FilterBar({
             <select
               value={sortBy}
               onChange={(e) => onSortChange(e.target.value as SortOption)}
-              className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 hover:border-blue-400 hover:shadow-md cursor-pointer"
             >
               <option value="distance">Distance</option>
               <option value="rating">Rating</option>
@@ -51,7 +51,7 @@ export default function FilterBar({
             <select
               value={minRating}
               onChange={(e) => onMinRatingChange(Number(e.target.value))}
-              className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 hover:border-blue-400 hover:shadow-md cursor-pointer"
             >
               <option value="0">Any</option>
               <option value="3">3.0+</option>
